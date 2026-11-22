@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sensor Data Dashboard</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f5f5f5;
+      margin: 0;
+      padding: 20px;
+    }
+    
+    .container {
+      max-width: 600px;
+      margin: 0 auto;
+      background-color: #fff;
+      padding: 20px;
+      border-radius: 5px;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
+    
+    h1 {
+      text-align: center;
+      color: #333;
+    }
+    
+    .sensor-data {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 20px;
+    }
+    
+    .sensor-item {
+      flex-basis: 30%;
+      padding: 20px;
+      background-color: #f9f9f9;
+      border-radius: 5px;
+      text-align: center;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
+    
+    .sensor-label {
+      font-size: 18px;
+      font-weight: bold;
+      color: #555;
+    }
+    
+    .sensor-value {
+      font-size: 24px;
+      color: #333;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Sensor Data Dashboard</h1>
+    <div class="sensor-data">
+      <div class="sensor-item">
+        <div class="sensor-label">Pressure</div>
+        <div class="sensor-value" id="pressure"></div>
+      </div>
+      <div class="sensor-item">
+        <div class="sensor-label">Temperature</div>
+        <div class="sensor-value" id="temperature"></div>
+      </div>
+      <div class="sensor-item">
+        <div class="sensor-label">Humidity</div>
+        <div class="sensor-value" id="humidity"></div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // GitHub Pages URL where the sensor data will be sent via webhook
+    const webhookURL = 'https://singhalpiyush161-blip.github.io/abc/sensor-data';
+
+    // Function to handle incoming webhook data
+    function handleWebhookData(data) {
+      document.getElementById('pressure').textContent = data.pressure;
+      document.getElementById('temperature').textContent = data.temperature;
+      document.getElementById('humidity').textContent = data.humidity;
+    }
+
+    // Set up event listener for webhook data
+    window.addEventListener('message', function(event) {
+      if (event.origin === 'https://send.pageclip.co') {
+        handleWebhookData(event.data);
+      }
+    }, false);
+  </script>
+</body>
+</html>
