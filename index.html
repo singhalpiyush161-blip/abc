@@ -3,125 +3,496 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Sensor Data Dashboard</title>
+  <title>Welham Boys' School · Weather Station</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Lato:wght@400;700&display=swap" rel="stylesheet">
   <style>
+    :root {
+      --espresso: #3b2418;
+      --brown:    #5d3a24;
+      --walnut:   #7a5136;
+      --tan:      #b08559;
+      --gold:     #c9a46a;
+      --sand:     #e6d5b8;
+      --beige:    #f3ebdd;
+      --cream:    #fbf7ef;
+      --live:     #6b8e4e;
+      --stale:    #b5532f;
+    }
+
+    * { box-sizing: border-box; }
+
     body {
-      font-family: Arial, sans-serif;
-      background-color: #f5f5f5;
       margin: 0;
-      padding: 20px;
+      min-height: 100vh;
+      font-family: 'Lato', Arial, sans-serif;
+      color: var(--espresso);
+      background:
+        radial-gradient(circle at 15% 10%, rgba(201,164,106,.25), transparent 40%),
+        radial-gradient(circle at 85% 90%, rgba(122,81,54,.18), transparent 45%),
+        repeating-linear-gradient(45deg, rgba(93,58,36,.03) 0 2px, transparent 2px 14px),
+        var(--beige);
+      padding: 32px 16px 48px;
     }
 
     .container {
-      max-width: 600px;
+      max-width: 900px;
       margin: 0 auto;
-      background-color: #fff;
-      padding: 20px;
-      border-radius: 5px;
-      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
+
+    /* ---------- Header ---------- */
+    header {
+      text-align: center;
+      padding: 36px 20px 30px;
+      border-radius: 18px;
+      background: linear-gradient(135deg, var(--espresso), var(--brown) 55%, var(--walnut));
+      color: var(--cream);
+      box-shadow: 0 14px 34px rgba(59,36,24,.35);
+      position: relative;
+      overflow: hidden;
+      animation: drop-in .8s cubic-bezier(.2,.8,.2,1) both;
+    }
+
+    header::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(110deg, transparent 30%, rgba(255,255,255,.12) 50%, transparent 70%);
+      transform: translateX(-100%);
+      animation: sheen 6s ease-in-out 1s infinite;
+    }
+
+    .emblem {
+      width: 58px;
+      height: 58px;
+      margin: 0 auto 14px;
+      color: var(--gold);
+      animation: spin-slow 30s linear infinite;
     }
 
     h1 {
-      text-align: center;
-      color: #333;
+      font-family: 'Cinzel', Georgia, serif;
+      font-size: clamp(24px, 5vw, 40px);
+      letter-spacing: .12em;
+      margin: 0;
+      text-transform: uppercase;
+      text-shadow: 0 2px 8px rgba(0,0,0,.3);
     }
 
-    .sensor-data {
+    .ornament {
       display: flex;
-      justify-content: space-between;
-      gap: 10px;
-      margin-top: 20px;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      margin: 14px auto 10px;
+      color: var(--gold);
+    }
+
+    .ornament span {
+      height: 1px;
+      width: 0;
+      background: var(--gold);
+      animation: grow-line 1s ease-out .6s forwards;
+    }
+
+    .subtitle {
+      margin: 0;
+      font-size: clamp(14px, 2.6vw, 18px);
+      letter-spacing: .2em;
+      text-transform: uppercase;
+      color: var(--sand);
+      opacity: 0;
+      animation: fade-up .8s ease-out .9s forwards;
+    }
+
+    /* ---------- Cards ---------- */
+    .sensor-data {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+      margin-top: 28px;
     }
 
     .sensor-item {
-      flex-basis: 30%;
-      padding: 20px 10px;
-      background-color: #f9f9f9;
-      border-radius: 5px;
+      background: var(--cream);
+      border: 1px solid var(--sand);
+      border-radius: 16px;
+      padding: 26px 18px 22px;
       text-align: center;
-      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+      box-shadow: 0 6px 18px rgba(59,36,24,.10);
+      transition: transform .3s ease, box-shadow .3s ease;
+      position: relative;
+      overflow: hidden;
+      opacity: 0;
+      animation: fade-up .7s ease-out forwards;
     }
 
+    .sensor-item:nth-child(1) { animation-delay: 1.0s; }
+    .sensor-item:nth-child(2) { animation-delay: 1.15s; }
+    .sensor-item:nth-child(3) { animation-delay: 1.3s; }
+
+    .sensor-item::after {
+      content: "";
+      position: absolute;
+      left: 0; right: 0; top: 0;
+      height: 4px;
+      background: linear-gradient(90deg, var(--walnut), var(--gold), var(--walnut));
+    }
+
+    .sensor-item:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 14px 28px rgba(59,36,24,.18);
+    }
+
+    .icon-wrap {
+      width: 84px;
+      height: 84px;
+      margin: 0 auto 14px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 35% 30%, var(--cream), var(--sand));
+      border: 2px solid var(--gold);
+      display: grid;
+      place-items: center;
+      box-shadow: inset 0 -4px 10px rgba(122,81,54,.15);
+    }
+
+    .icon-wrap svg { width: 54px; height: 54px; overflow: visible; }
+
     .sensor-label {
-      font-size: 18px;
-      font-weight: bold;
-      color: #555;
+      font-family: 'Cinzel', Georgia, serif;
+      font-size: 16px;
+      font-weight: 700;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      color: var(--walnut);
     }
 
     .sensor-value {
-      font-size: 24px;
-      color: #333;
-      margin-top: 10px;
+      font-size: 34px;
+      font-weight: 700;
+      color: var(--espresso);
+      margin-top: 8px;
+      font-variant-numeric: tabular-nums;
+      min-height: 44px;
     }
 
+    .sensor-value .unit {
+      font-size: 16px;
+      font-weight: 400;
+      color: var(--tan);
+      margin-left: 4px;
+    }
+
+    .sensor-value.pulse { animation: pulse .7s ease-out; }
+
+    .bar {
+      height: 6px;
+      border-radius: 3px;
+      background: var(--sand);
+      margin: 14px 8px 0;
+      overflow: hidden;
+    }
+
+    .bar div {
+      height: 100%;
+      width: 0;
+      border-radius: 3px;
+      background: linear-gradient(90deg, var(--tan), var(--brown));
+      transition: width 1.2s cubic-bezier(.2,.8,.2,1);
+    }
+
+    .range {
+      display: flex;
+      justify-content: space-between;
+      font-size: 11px;
+      color: var(--tan);
+      margin: 4px 8px 0;
+    }
+
+    /* ---------- Icons ---------- */
+    .needle {
+      transform-box: view-box;
+      transform-origin: 24px 32px;
+      transform: rotate(-90deg);
+      transition: transform 1.4s cubic-bezier(.3,1.4,.5,1);
+    }
+
+    .mercury {
+      transform-box: view-box;
+      transform-origin: 24px 37px;
+      transform: scaleY(0);
+      transition: transform 1.4s cubic-bezier(.2,.8,.2,1);
+    }
+
+    .thermo-bulb { animation: glow 2.4s ease-in-out infinite; }
+
+    .water {
+      transform-box: view-box;
+      transform: translateY(46px);
+      transition: transform 1.4s cubic-bezier(.2,.8,.2,1);
+    }
+
+    .wave { animation: wave 3s linear infinite; }
+    .drop-icon { animation: bob 3s ease-in-out infinite; }
+
+    /* ---------- Status ---------- */
     .status {
-      text-align: center;
-      margin-top: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      width: fit-content;
+      margin: 28px auto 0;
+      padding: 10px 20px;
+      border-radius: 999px;
+      background: var(--cream);
+      border: 1px solid var(--sand);
       font-size: 14px;
-      color: #777;
+      color: var(--walnut);
+      box-shadow: 0 4px 12px rgba(59,36,24,.08);
+      opacity: 0;
+      animation: fade-up .7s ease-out 1.5s forwards;
     }
 
-    .status.stale { color: #c0392b; }
+    .dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: var(--tan);
+      position: relative;
+      flex-shrink: 0;
+    }
 
-    @media (max-width: 480px) {
-      .sensor-data { flex-direction: column; }
+    .dot::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      border-radius: 50%;
+      background: inherit;
+      animation: ping 1.8s ease-out infinite;
+    }
+
+    .status.live  .dot { background: var(--live); }
+    .status.stale .dot { background: var(--stale); }
+    .status.stale { color: var(--stale); }
+
+    footer {
+      text-align: center;
+      margin-top: 18px;
+      font-size: 12px;
+      letter-spacing: .08em;
+      color: var(--tan);
+    }
+
+    /* ---------- Keyframes ---------- */
+    @keyframes drop-in   { from { opacity: 0; transform: translateY(-24px); } to { opacity: 1; transform: none; } }
+    @keyframes fade-up   { from { opacity: 0; transform: translateY(18px); } to { opacity: 1; transform: none; } }
+    @keyframes grow-line { to { width: 70px; } }
+    @keyframes sheen     { 0%, 60% { transform: translateX(-100%); } 100% { transform: translateX(100%); } }
+    @keyframes spin-slow { to { transform: rotate(360deg); } }
+    @keyframes pulse     { 0% { transform: scale(1); } 40% { transform: scale(1.12); color: var(--walnut); } 100% { transform: scale(1); } }
+    @keyframes glow      { 0%, 100% { opacity: 1; } 50% { opacity: .7; } }
+    @keyframes bob       { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-3px); } }
+    @keyframes wave      { from { transform: translateX(0); } to { transform: translateX(-24px); } }
+    @keyframes ping      { 0% { transform: scale(1); opacity: .7; } 100% { transform: scale(2.8); opacity: 0; } }
+
+    @media (max-width: 680px) {
+      .sensor-data { grid-template-columns: 1fr; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation: none !important; transition: none !important; opacity: 1 !important; }
+      .ornament span { width: 70px; }
     }
   </style>
 </head>
 <body>
   <div class="container">
-    <h1>Sensor Data Dashboard</h1>
-    <div class="sensor-data">
-      <div class="sensor-item">
+
+    <header>
+      <!-- Decorative compass-rose emblem -->
+      <svg class="emblem" viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+        <circle cx="32" cy="32" r="29"/>
+        <circle cx="32" cy="32" r="22" stroke-dasharray="2 4"/>
+        <path d="M32 6 L37 32 L32 58 L27 32 Z" fill="currentColor" fill-opacity=".35"/>
+        <path d="M6 32 L32 27 L58 32 L32 37 Z" fill="currentColor" fill-opacity=".2"/>
+        <circle cx="32" cy="32" r="3" fill="currentColor"/>
+      </svg>
+      <h1>Welham Boys' School</h1>
+      <div class="ornament" aria-hidden="true">
+        <span></span>
+        <svg width="14" height="14" viewBox="0 0 14 14"><path d="M7 0 L9 5 L14 7 L9 9 L7 14 L5 9 L0 7 L5 5 Z" fill="currentColor"/></svg>
+        <span></span>
+      </div>
+      <p class="subtitle">Pressure, Temperature &amp; Humidity</p>
+    </header>
+
+    <main class="sensor-data">
+
+      <!-- Pressure -->
+      <section class="sensor-item">
+        <div class="icon-wrap">
+          <svg viewBox="0 0 48 48" aria-hidden="true">
+            <path d="M8 32 A16 16 0 0 1 40 32" fill="none" stroke="#e6d5b8" stroke-width="5" stroke-linecap="round"/>
+            <path d="M8 32 A16 16 0 0 1 40 32" fill="none" stroke="#7a5136" stroke-width="1.5" stroke-dasharray="1 4"/>
+            <g class="needle" id="needle">
+              <line x1="24" y1="32" x2="24" y2="15" stroke="#3b2418" stroke-width="2.5" stroke-linecap="round"/>
+            </g>
+            <circle cx="24" cy="32" r="3.5" fill="#c9a46a" stroke="#3b2418" stroke-width="1.5"/>
+            <text x="24" y="43" text-anchor="middle" font-size="6" fill="#7a5136" font-family="Lato, sans-serif">hPa</text>
+          </svg>
+        </div>
         <div class="sensor-label">Pressure</div>
         <div class="sensor-value" id="pressure">--</div>
-      </div>
-      <div class="sensor-item">
+        <div class="bar"><div id="pressure-bar"></div></div>
+        <div class="range"><span>950</span><span>1050</span></div>
+      </section>
+
+      <!-- Temperature -->
+      <section class="sensor-item">
+        <div class="icon-wrap">
+          <svg viewBox="0 0 48 48" aria-hidden="true">
+            <rect x="19" y="4" width="10" height="32" rx="5" fill="#fbf7ef" stroke="#3b2418" stroke-width="2"/>
+            <rect class="mercury" id="mercury" x="21.5" y="9" width="5" height="28" rx="2.5" fill="#b5532f"/>
+            <circle class="thermo-bulb" cx="24" cy="38" r="7" fill="#b5532f" stroke="#3b2418" stroke-width="2"/>
+            <g stroke="#7a5136" stroke-width="1.2">
+              <line x1="31" y1="10" x2="34" y2="10"/>
+              <line x1="31" y1="16" x2="33" y2="16"/>
+              <line x1="31" y1="22" x2="34" y2="22"/>
+              <line x1="31" y1="28" x2="33" y2="28"/>
+            </g>
+          </svg>
+        </div>
         <div class="sensor-label">Temperature</div>
         <div class="sensor-value" id="temperature">--</div>
-      </div>
-      <div class="sensor-item">
+        <div class="bar"><div id="temperature-bar"></div></div>
+        <div class="range"><span>0 °C</span><span>50 °C</span></div>
+      </section>
+
+      <!-- Humidity -->
+      <section class="sensor-item">
+        <div class="icon-wrap">
+          <svg class="drop-icon" viewBox="0 0 48 48" aria-hidden="true">
+            <defs>
+              <clipPath id="dropClip">
+                <path d="M24 4 C24 4 10 20 10 30 A14 14 0 0 0 38 30 C38 20 24 4 24 4 Z"/>
+              </clipPath>
+            </defs>
+            <path d="M24 4 C24 4 10 20 10 30 A14 14 0 0 0 38 30 C38 20 24 4 24 4 Z" fill="#fbf7ef"/>
+            <g clip-path="url(#dropClip)">
+              <g class="water" id="water">
+                <path class="wave" fill="#7a5136"
+                      d="M0 2 Q6 -1 12 2 T24 2 T36 2 T48 2 T60 2 T72 2 V60 H0 Z"/>
+              </g>
+            </g>
+            <path d="M24 4 C24 4 10 20 10 30 A14 14 0 0 0 38 30 C38 20 24 4 24 4 Z"
+                  fill="none" stroke="#3b2418" stroke-width="2"/>
+            <path d="M17 29 A7 7 0 0 0 21 36" fill="none" stroke="#fbf7ef" stroke-width="2" stroke-linecap="round" opacity=".8"/>
+          </svg>
+        </div>
         <div class="sensor-label">Humidity</div>
         <div class="sensor-value" id="humidity">--</div>
-      </div>
-    </div>
-    <div class="status" id="status">Loading…</div>
+        <div class="bar"><div id="humidity-bar"></div></div>
+        <div class="range"><span>0 %</span><span>100 %</span></div>
+      </section>
+
+    </main>
+
+    <div class="status" id="status"><span class="dot"></span><span id="status-text">Connecting to weather station…</span></div>
+    <footer>Live data from the school's NodeMCU sensor · refreshes every 30 seconds</footer>
   </div>
 
   <script>
     // Netlify function that stores and returns the latest reading
     const DATA_URL = 'https://capable-lebkuchen-0bc215.netlify.app/sensor-data';
-    const POLL_MS = 30000;          // refresh every 30 s
-    const STALE_AFTER_MS = 3 * 60000; // flag data older than 3 min
+    const POLL_MS = 30000;             // refresh every 30 s
+    const STALE_AFTER_MS = 3 * 60000;  // flag data older than 3 min
 
-    function show(id, value, unit, decimals) {
-      document.getElementById(id).textContent =
-        (typeof value === 'number') ? value.toFixed(decimals) + ' ' + unit : '--';
+    const SENSORS = {
+      pressure:    { unit: 'hPa', decimals: 1, min: 950, max: 1050 },
+      temperature: { unit: '°C',  decimals: 1, min: 0,   max: 50 },
+      humidity:    { unit: '%',   decimals: 0, min: 0,   max: 100 },
+    };
+
+    const lastValues = {};
+
+    const clamp01 = (v) => Math.max(0, Math.min(1, v));
+
+    // Smoothly counts the number up/down to the new value
+    function animateNumber(el, from, to, decimals, unit) {
+      const duration = 900;
+      const start = performance.now();
+      function frame(now) {
+        const t = Math.min(1, (now - start) / duration);
+        const eased = 1 - Math.pow(1 - t, 3);
+        const v = from + (to - from) * eased;
+        el.innerHTML = v.toFixed(decimals) + '<span class="unit">' + unit + '</span>';
+        if (t < 1) requestAnimationFrame(frame);
+      }
+      requestAnimationFrame(frame);
+    }
+
+    function updateIcon(id, frac) {
+      if (id === 'pressure') {
+        document.getElementById('needle').style.transform = 'rotate(' + (-90 + frac * 180) + 'deg)';
+      } else if (id === 'temperature') {
+        document.getElementById('mercury').style.transform = 'scaleY(' + frac + ')';
+      } else if (id === 'humidity') {
+        // drop spans roughly y=4 (top) to y=44 (bottom)
+        document.getElementById('water').style.transform = 'translateY(' + (44 - frac * 40) + 'px)';
+      }
+    }
+
+    function show(id, value) {
+      const cfg = SENSORS[id];
+      const el = document.getElementById(id);
+
+      if (typeof value !== 'number') {
+        el.textContent = '--';
+        return;
+      }
+
+      const prev = lastValues[id] ?? value;
+      if (lastValues[id] === undefined || prev !== value) {
+        animateNumber(el, lastValues[id] === undefined ? cfg.min : prev, value, cfg.decimals, cfg.unit);
+        el.classList.remove('pulse');
+        void el.offsetWidth;          // restart the pulse animation
+        el.classList.add('pulse');
+      }
+      lastValues[id] = value;
+
+      const frac = clamp01((value - cfg.min) / (cfg.max - cfg.min));
+      document.getElementById(id + '-bar').style.width = (frac * 100) + '%';
+      updateIcon(id, frac);
+    }
+
+    function setStatus(text, state) {
+      const box = document.getElementById('status');
+      document.getElementById('status-text').textContent = text;
+      box.classList.toggle('live', state === 'live');
+      box.classList.toggle('stale', state === 'stale');
     }
 
     async function update() {
-      const status = document.getElementById('status');
       try {
         const res = await fetch(DATA_URL, { cache: 'no-store' });
         if (res.status === 404) {
-          status.textContent = 'No data received yet.';
+          setStatus('Waiting for the first reading…', '');
           return;
         }
         if (!res.ok) throw new Error('HTTP ' + res.status);
 
         const data = await res.json();
-        show('pressure', data.pressure, 'hPa', 1);
-        show('temperature', data.temperature, '°C', 1);
-        show('humidity', data.humidity, '%', 0);
+        show('pressure', data.pressure);
+        show('temperature', data.temperature);
+        show('humidity', data.humidity);
 
         const when = new Date(data.receivedAt);
         const stale = Date.now() - when.getTime() > STALE_AFTER_MS;
-        status.textContent = (stale ? 'Sensor offline? Last update: ' : 'Last update: ')
-          + when.toLocaleString();
-        status.classList.toggle('stale', stale);
+        setStatus((stale ? 'Sensor offline? Last update: ' : 'Live · Last update: ') + when.toLocaleString(), stale ? 'stale' : 'live');
       } catch (err) {
-        status.textContent = 'Could not reach server (' + err.message + ')';
-        status.classList.add('stale');
+        setStatus('Could not reach server (' + err.message + ')', 'stale');
       }
     }
 
