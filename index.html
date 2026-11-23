@@ -11,7 +11,7 @@
       margin: 0;
       padding: 20px;
     }
-    
+
     .container {
       max-width: 600px;
       margin: 0 auto;
@@ -20,37 +20,51 @@
       border-radius: 5px;
       box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
     }
-    
+
     h1 {
       text-align: center;
       color: #333;
     }
-    
+
     .sensor-data {
       display: flex;
       justify-content: space-between;
+      gap: 10px;
       margin-top: 20px;
     }
-    
+
     .sensor-item {
       flex-basis: 30%;
-      padding: 20px;
+      padding: 20px 10px;
       background-color: #f9f9f9;
       border-radius: 5px;
       text-align: center;
       box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
     }
-    
+
     .sensor-label {
       font-size: 18px;
       font-weight: bold;
       color: #555;
     }
-    
+
     .sensor-value {
       font-size: 24px;
       color: #333;
       margin-top: 10px;
+    }
+
+    .status {
+      text-align: center;
+      margin-top: 20px;
+      font-size: 14px;
+      color: #777;
+    }
+
+    .status.stale { color: #c0392b; }
+
+    @media (max-width: 480px) {
+      .sensor-data { flex-direction: column; }
     }
   </style>
 </head>
@@ -60,36 +74,59 @@
     <div class="sensor-data">
       <div class="sensor-item">
         <div class="sensor-label">Pressure</div>
-        <div class="sensor-value" id="pressure"></div>
+        <div class="sensor-value" id="pressure">--</div>
       </div>
       <div class="sensor-item">
         <div class="sensor-label">Temperature</div>
-        <div class="sensor-value" id="temperature"></div>
+        <div class="sensor-value" id="temperature">--</div>
       </div>
       <div class="sensor-item">
         <div class="sensor-label">Humidity</div>
-        <div class="sensor-value" id="humidity"></div>
+        <div class="sensor-value" id="humidity">--</div>
       </div>
     </div>
+    <div class="status" id="status">Loading…</div>
   </div>
 
   <script>
-    // GitHub Pages URL where the sensor data will be sent via webhook
-    const webhookURL = 'https://capable-lebkuchen-0bc215.netlify.app/sensor-data';
+    // Netlify function that stores and returns the latest reading
+    const DATA_URL = 'https://capable-lebkuchen-0bc215.netlify.app/sensor-data';
+    const POLL_MS = 30000;          // refresh every 30 s
+    const STALE_AFTER_MS = 3 * 60000; // flag data older than 3 min
 
-    // Function to handle incoming webhook data
-    function handleWebhookData(data) {
-      document.getElementById('pressure').textContent = data.pressure;
-      document.getElementById('temperature').textContent = data.temperature;
-      document.getElementById('humidity').textContent = data.humidity;
+    function show(id, value, unit, decimals) {
+      document.getElementById(id).textContent =
+        (typeof value === 'number') ? value.toFixed(decimals) + ' ' + unit : '--';
     }
 
-    // Set up event listener for webhook data
-    window.addEventListener('message', function(event) {
-      if (event.origin === 'https://send.pageclip.co') {
-        handleWebhookData(event.data);
+    async function update() {
+      const status = document.getElementById('status');
+      try {
+        const res = await fetch(DATA_URL, { cache: 'no-store' });
+        if (res.status === 404) {
+          status.textContent = 'No data received yet.';
+          return;
+        }
+        if (!res.ok) throw new Error('HTTP ' + res.status);
+
+        const data = await res.json();
+        show('pressure', data.pressure, 'hPa', 1);
+        show('temperature', data.temperature, '°C', 1);
+        show('humidity', data.humidity, '%', 0);
+
+        const when = new Date(data.receivedAt);
+        const stale = Date.now() - when.getTime() > STALE_AFTER_MS;
+        status.textContent = (stale ? 'Sensor offline? Last update: ' : 'Last update: ')
+          + when.toLocaleString();
+        status.classList.toggle('stale', stale);
+      } catch (err) {
+        status.textContent = 'Could not reach server (' + err.message + ')';
+        status.classList.add('stale');
       }
-    }, false);
+    }
+
+    update();
+    setInterval(update, POLL_MS);
   </script>
 </body>
 </html>
